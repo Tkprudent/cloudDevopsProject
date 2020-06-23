@@ -1,0 +1,44 @@
+Description: >
+  Kazeem  Tijani / Udacity Cloud Devops 2020 - 
+  This is the YAML file for the IAM.
+   
+Parameters:
+  EnvironmentName:
+    Description: An Environment name that will be prefixed to resources
+    Type: String
+    
+Resources:
+  IAMRoleWebApp:
+    Type: "AWS::IAM::Role"
+    Properties:
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+
+  IAMWebAppS3IP:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+        - Ref: "IAMRoleWebApp"
+
+Outputs:
+  IAMRoleWebApp:
+    Description: "Allow EC2 instances to manage Web App S3"
+    Value: !Ref IAMWebAppS3IP
+    Export:
+      Name: !Sub ${EnvironmentName}-IAM-NAME
+  IAMRoleWebAppArn:
+    Description: Iam Instance Profile Arn
+    Value: !GetAtt IAMRoleWebApp.Arn
+    Export:
+      Name: !Sub ${EnvironmentName}-IAM-ARN
