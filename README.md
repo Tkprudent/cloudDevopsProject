@@ -46,7 +46,7 @@ Servers Deployment: aws cloudformation create-stack --stack-name udagramNetworkS
 Run the script from terminal(Windows, Linux or Mac) with AWS client application installed and configured connect and run cloudformation scripts on AWS.
 
 ### Application Deployment Diagram
-  <img src="UUdagramCloudInfraDiagram.png">
+  <img src="UdagramCloudInfraDiagram.png">
   
 ### Prerequisites
 
