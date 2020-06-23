@@ -1,0 +1,123 @@
+Description: >
+  Kazeem Tijani / Udacity Cloud Devops 2020 - 
+  This template deploys the security groups needed by the Udagram application
+Parameters:
+  EnvironmentName:
+    Description: An Environment name that will be prefixed to resources
+    Type: String
+
+Resources:
+  LoadBalancerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to our load balancer
+      VpcId: 
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPC-ID"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Load Balancer Security Group
+  
+  WebServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to our hosts and SSH from local only
+      VpcId: 
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPC-ID"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+
+  BastionIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+
+  BastionIamPolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: fullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "s3:*"
+            Resource: "*"
+      Roles:
+        - !Ref BastionIamRole
+
+  BastionIamInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref BastionIamRole
+
+  BastionEC20:
+    Type: AWS::EC2::Instance
+    DependsOn:
+        - WebServerSecGroup
+        - BastionIamInstanceProfile
+    Properties:
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            apt-get update -y
+            apt-get install unzip awscli -y
+            apt-get install apache2 -y
+            systemctl start apache2.service
+            sudo rm /var/www/html/index.html
+            sudo aws s3 cp s3://udacity-demo-1/udacity.zip /var/www/html
+            sudo unzip /var/www/html/udacity.zip -d /var/www/html
+            systemctl restart apache2.service
+        IamInstanceProfile: !Ref BastionIamInstanceProfile
+        SecurityGroupIds:
+        - Ref: WebServerSecGroup
+        SubnetId:
+          Fn::ImportValue: !Sub "${EnvironmentName}-PUB1-SN"
+        ImageId: ami-0d1cd67c26f5fca19
+        BlockDeviceMappings:
+          - DeviceName: "/dev/sdk"
+            Ebs:
+              VolumeSize: "10"
+              DeleteOnTermination: true
+              VolumeType: "gp2"
+        InstanceType: t3.small
+        KeyName: vino
+
+
+Outputs:
+  Website:
+    Description: The Public DNS for the EC2 Instance
+    Value: !Join ["", ["http://", !GetAtt [BastionEC20, PublicDnsName]]]
