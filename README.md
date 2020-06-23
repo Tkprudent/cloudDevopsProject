@@ -65,11 +65,7 @@ Test by using the aws console to verify if the stack were created as expected.
 * [Lucidchart](https://www.lucidchart.com/pages/?noHomepageRedirect=true) - Diagrams done right.
 
 
-### Contributing
-* **Kazeem Tijani ** 
-
-
-### Authors
+### Author
 
 * **Kazeem Tijani** 
 
