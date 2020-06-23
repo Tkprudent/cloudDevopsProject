@@ -39,9 +39,11 @@ This needs to be done in an automated fashion so that the infrastructure can be 
 
 ###### From the project root folder run for:
 
-Network Deployment: aws cloudformation create-stack --stack-name udagramNetworkInfra --template-body file://ktUdagramNetwork.yml --parameters file://ktUdagramNetwork-params.json
+Network Deployment: ./create.sh udagramNetworkInfra ktUdagramNetwork.yml ktUdagramNetwork-params.json
 
-Servers Deployment: aws cloudformation create-stack --stack-name udagramNetworkServer --template-body file://ktUdagramServers.yml --parameters file://ktUdergranServers-params.json --capabilities CAPABILITY_IAM
+IAM Deployment: ./create.sh iamInfraStack iam.yml ktUdagramServer-params.json
+
+Servers Deployment:  ./create.sh udagramServerInfra ktUdagramServer.yml ktUdagramServer-params.json
 
 Run the script from terminal(Windows, Linux or Mac) with AWS client application installed and configured connect and run cloudformation scripts on AWS.
 
