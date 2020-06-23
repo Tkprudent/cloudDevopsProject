@@ -114,7 +114,7 @@ Resources:
               DeleteOnTermination: true
               VolumeType: "gp2"
         InstanceType: t3.small
-        KeyName: vino
+        KeyName: teekay
 
 
 Outputs:
