@@ -79,3 +79,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Inspiration [AWS Documentation](https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_TABLE_NEW.html),
 [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
 
+* Carlos Rivas, Senior Solutions Architect at Infiniti Consulting
+
